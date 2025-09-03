@@ -1,6 +1,26 @@
 # 💳 FinTech API
 
-FinTech API — bu Django va Django REST Framework asosida yozilgan hamyon va tranzaksiya boshqaruv tizimi.  
+[![Django](https://img.shields.io/badge/Django-4.x-green)](https://www.djangoproject.com/)  
+[![DRF](https://img.shields.io/badge/DRF-3.x-red)](https://www.django-rest-framework.org/)  
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-blue)](https://www.postgresql.org/)  
+[![Redis](https://img.shields.io/badge/Redis-6+-orange)](https://redis.io/)  
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)  
+
+FinTech API — bu **hamyonlar** va **tranzaksiyalarni** boshqarish uchun ishlab chiqilgan **RESTful API**.  
+Ushbu loyiha **bank, wallet yoki payment tizimlari** uchun asosiy fundament sifatida xizmat qiladi.  
+
+---
+
+## 📑 Mazmun
+
+- [🚀 Tez Start](#-tez-start)
+- [⚙️ Arxitektura](#️-arxitektura)
+- [📚 API Documentation](#-api-documentation)
+- [🎯 API Foydalanish Misollari](#-api-foydalanish-misollari)
+- [🧪 Testlar](#-testlar)
+- [☁️ Deploy](#️-deploy)
+- [🛠 Texnologiyalar](#-texnologiyalar)
+- [👨‍💻 Author](#-author)
 
 ---
 
@@ -14,35 +34,28 @@ FinTech API — bu Django va Django REST Framework asosida yozilgan hamyon va tr
 
 ---
 
-### 1️⃣ Loyihani Clone Qilish
+### 1️⃣ Clone & Install
 
 ```bash
 git clone https://github.com/yourusername/fintech-api.git
 cd fintech-api
 ```
 
----
-
-### 2️⃣ Virtual Muhit Yarating
+### 2️⃣ Virtual Muhit
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
-# yoki
-.venv\Scripts\activate  # Windows
+.venv\Scripts\activate     # Windows
 ```
 
----
-
-### 3️⃣ Kutubxonalarni O'rnatish
+### 3️⃣ Kutubxonalar
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-### 4️⃣ Muhit O'zgaruvchilarini Sozlash
+### 4️⃣ Muhit O'zgaruvchilari
 
 ```bash
 cp .env.example .env
@@ -53,13 +66,11 @@ cp .env.example .env
 ```env
 DEBUG=True
 SECRET_KEY=your-super-secret-key-here
-DATABASE_URL=sqlite:///db.sqlite3
+DATABASE_URL=postgres://user:password@localhost:5432/fintech
 REDIS_URL=redis://localhost:6379/0
 ```
 
----
-
-### 5️⃣ Ma'lumotlar Bazasini Sozlash
+### 5️⃣ Database Migratsiya
 
 ```bash
 python manage.py makemigrations
@@ -67,21 +78,35 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
----
-
 ### 6️⃣ Serverni Ishga Tushirish
 
 ```bash
 python manage.py runserver
 ```
 
-👉 Loyihaga kirish: [http://localhost:8000](http://localhost:8000)
+👉 [http://localhost:8000](http://localhost:8000)
+
+---
+
+## ⚙️ Arxitektura
+
+```mermaid
+flowchart TD
+    Client[🧑‍💻 Client] -->|HTTP/JSON| API[🌐 Django REST API]
+    API -->|CRUD| DB[(PostgreSQL)]
+    API -->|Cache/Tasks| Redis[(Redis)]
+    API --> Auth[🔐 JWT Auth]
+    API --> Wallet[💼 Wallet Service]
+    API --> Txn[💸 Transaction Service]
+    Wallet --> DB
+    Txn --> DB
+```
 
 ---
 
 ## 📚 API Documentation
 
-### 🔐 Authentication Endpoints
+### 🔐 Authentication
 
 | Method | Endpoint                 | Description              |
 |--------|---------------------------|--------------------------|
@@ -92,7 +117,7 @@ python manage.py runserver
 
 ---
 
-### 💼 Wallet Endpoints
+### 💼 Wallet
 
 | Method | Endpoint              | Description               |
 |--------|------------------------|---------------------------|
@@ -104,7 +129,7 @@ python manage.py runserver
 
 ---
 
-### 💸 Transaction Endpoints
+### 💸 Transactions
 
 | Method | Endpoint                        | Description             |
 |--------|----------------------------------|-------------------------|
@@ -117,12 +142,10 @@ python manage.py runserver
 
 ## 🎯 API Foydalanish Misollari
 
-### 🔹 Ro'yxatdan O'tish
+### Ro'yxatdan O'tish
 
 ```bash
-curl -X POST http://localhost:8000/auth/api/register/ \
-  -H "Content-Type: application/json" \
-  -d '{
+curl -X POST http://localhost:8000/auth/api/register/   -H "Content-Type: application/json"   -d '{
     "username": "testuser",
     "email": "test@example.com",
     "password": "TestPass123!",
@@ -130,27 +153,19 @@ curl -X POST http://localhost:8000/auth/api/register/ \
   }'
 ```
 
----
-
-### 🔹 Login Qilish
+### Login Qilish
 
 ```bash
-curl -X POST http://localhost:8000/auth/api/login/ \
-  -H "Content-Type: application/json" \
-  -d '{
+curl -X POST http://localhost:8000/auth/api/login/   -H "Content-Type: application/json"   -d '{
     "username": "testuser",
     "password": "TestPass123!"
   }'
 ```
 
----
-
-### 🔹 Yangi Hamyon Yaratish
+### Hamyon Yaratish
 
 ```bash
-curl -X POST http://localhost:8000/api/wallets/ \
-  -H "Content-Type: application/json" \
-  -d '{
+curl -X POST http://localhost:8000/api/wallets/   -H "Content-Type: application/json"   -d '{
     "name": "My Wallet",
     "currency": "USD",
     "balance": 1000
@@ -159,18 +174,46 @@ curl -X POST http://localhost:8000/api/wallets/ \
 
 ---
 
+## 🧪 Testlar
+
+Unit testlarni ishga tushirish:
+
+```bash
+pytest
+```
+
+Coverage bilan:
+
+```bash
+pytest --cov=.
+```
+
+---
+
+## ☁️ Deploy
+
+Docker orqali:
+
+```bash
+docker-compose up --build -d
+```
+
+👉 Production uchun `DEBUG=False` qilib sozlashni unutmang.  
+
+---
+
 ## 🛠 Texnologiyalar
 
-- Django
-- Django REST Framework
+- Django + DRF
 - PostgreSQL / SQLite
-- Redis
-- Celery
+- Redis + Celery
+- Docker + Docker Compose
+- Pytest (testlar uchun)
 
 ---
 
 ## 👨‍💻 Author
 
-[Your Name](https://github.com/Sunatillo2024)
+Created by [Your Name](https://github.com/yourusername)  
 
----
+Licensed under [MIT](LICENSE) ⚖️

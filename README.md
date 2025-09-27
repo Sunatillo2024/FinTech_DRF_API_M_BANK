@@ -214,6 +214,6 @@ docker-compose up --build -d
 
 ## 👨‍💻 Author
 
-Created by [Your Name](https://github.com/yourusername)  
+Created by [Your Name](https://github.com/Sunatillo2024)  
 
 Licensed under [MIT](LICENSE) ⚖️
